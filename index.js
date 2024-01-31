@@ -19,7 +19,10 @@ app.use(cors());
 app.use(express.json());
 
 // crear rutas
-const rutas_articulo = require();
+const rutas_articulo = require('./rutas/articulo');
+
+//cargando rutas
+app.use('/api', rutas_articulo);
 
 // crear servidor y escuchar peticiones http
 app.listen(puerto, () =>{
