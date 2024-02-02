@@ -1,7 +1,7 @@
-const {Schema , model} = require('mongoose');
+const {Schema, model} = require('mongoose');
 
 //formato de cada uno de mis objetos que voy a guardar en mi base de datos
-const ArticuloScheman = Schema ({
+const ArticuloSchema = Schema ({
     titulo: {
         type: String, 
         require: true
@@ -22,4 +22,4 @@ const ArticuloScheman = Schema ({
 })
 
 //exporto el esquema
-module.exports = model('Articulo',ArticuloScheman,'articulos')
+module.exports = model('modelArticulo',ArticuloSchema,'articulos')

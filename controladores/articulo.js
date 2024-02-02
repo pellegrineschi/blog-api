@@ -1,5 +1,6 @@
 const validator = require("validator");
-const Articulo = require("../modelos/Articulo");
+const Articulo = require('../modelos/Articulo')
+
 
 const crear = (req, res) => {
   //recoger parametros por post para guardar
@@ -22,6 +23,8 @@ const crear = (req, res) => {
 
   // crear el objeto a guardar
   const articulo = new Articulo(parametro);
+
+  
   
   //guardar el articulo en la db
   articulo.save((error, articuloGuardado)=>{
