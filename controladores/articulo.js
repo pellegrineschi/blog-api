@@ -1,37 +1,50 @@
 const validator = require("validator");
+const Articulo = require("../modelos/Articulo");
 
 const crear = (req, res) => {
   //recoger parametros por post para guardar
-  let paramametro = req.body;
+  let parametro = req.body;
   //validar
   try {
     let validarTitulo =
-      !validator.isEmpty(paramametro.titulo) &&
-      validator.isLength(paramametro.titulo, { min: 5, max: 15 });
+      !validator.isEmpty(parametro.titulo) &&
+      validator.isLength(parametro.titulo, { min: 5, max: 15 });
     let validarContenido = !validator.isEmpty(paramametro.contenido);
         if(!validarTitulo || !validarContenido){
             throw new Error('no se a validado la informacion');
         }
   } catch (error) {
     return res.status(400).json({
-      status: error,
+      status: 'error',
       mensaje: "faltan datos",
     });
   }
 
-  return res.status(200).json({
-    mensaje: "metodo para crear",
-    paramametro,
-  });
+  // crear el objeto a guardar
+  const articulo = new Articulo(parametro);
+  
+  //guardar el articulo en la db
+  articulo.save((error, articuloGuardado)=>{
+
+    if(error || !articuloGuardado){
+      return res.status(400).json({
+        status: 'error',
+        mensaje: "no se guardo el articulo"
+      });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      articulo: articuloGuardado,
+      mensaje:'guardado con exito'
+    });
+  })
+
+  
 };
 
-const prueba = (req, res) => {
-  return res.status(200).json({
-    mensaje: "soy una accion de prueba",
-  });
-};
+
 
 module.exports = {
-  prueba,
-  crear,
+  crear
 };
