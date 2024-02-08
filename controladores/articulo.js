@@ -38,12 +38,33 @@ const crear = async(req, res) => {
       mensaje: 'no se pudo guardar el archivo'
     })
   }
-
   
 };
 
-
+const obtenerTodos = async (req, res) => {
+  try {
+    const articulos = await Articulo.find();
+    return res.status(200).json({
+      status: 'success',
+      articulos: articulos,
+      mensaje: 'Artículos obtenidos exitosamente',
+    });
+  } catch (error) {
+    console.error('Error al obtener los artículos:', error);
+    return res.status(500).json({
+      status: 'error',
+      mensaje: 'No se pudieron obtener los artículos',
+    });
+  }
+};
 
 module.exports = {
-  crear
+  crear,
+  obtenerTodos
 };
+
+
+
+
+
+
