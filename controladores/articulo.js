@@ -1,5 +1,6 @@
 const validator = require("validator");
 const Articulo = require("../modelos/Articulo");
+const { default: mongoose } = require("mongoose");
 
 const crear = async(req, res) => {
   //recoger parametros por post para guardar
@@ -43,9 +44,12 @@ const crear = async(req, res) => {
 
 const obtenerTodos = async (req, res) => {
   try {
-    const articulos = await Articulo.find();
-    return res.status(200).json({
+    
+    const ultimos = req.params.cant; 
+      const articulos = await Articulo.find().sort({fecha: -1}).limit(ultimos);//traigo y ordeno de mandera desendente los ultimos alticulos que me llegan por parametro
+      return res.status(200).json({
       status: 'success',
+      contador: articulos.length,//cuento la cantidad de objetos en el array
       articulos: articulos,
       mensaje: 'Artículos obtenidos exitosamente',
     });
@@ -62,6 +66,9 @@ module.exports = {
   crear,
   obtenerTodos
 };
+
+
+
 
 
 
