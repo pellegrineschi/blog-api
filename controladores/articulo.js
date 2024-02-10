@@ -62,9 +62,36 @@ const obtenerTodos = async (req, res) => {
   }
 };
 
+const uno = async (req, res) =>{
+  let id = req.params.id
+  try {
+    const articuloEncontrado = await Articulo.findById(id);//trae un articulo por el id
+    if (articuloEncontrado) {
+      return res.status(200).json({
+       status: 'success',
+       articulo: articuloEncontrado,
+       mensaje: 'articulo econtrado' 
+      })
+    } else {
+      return res.status(400).json({
+        status: 'error',
+        mensaje: 'articulo no encontrado'
+      })
+    }
+  } catch (error) {
+    console.error('Error al obtener el artículo:', error);
+    return res.status(500).json({
+      status: 'error',
+      mensaje: 'No se pudieron obtener el articulo',
+    });
+  }
+}
+
+
 module.exports = {
   crear,
-  obtenerTodos
+  obtenerTodos,
+  uno
 };
 
 
