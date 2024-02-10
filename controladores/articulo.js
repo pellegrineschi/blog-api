@@ -87,11 +87,41 @@ const uno = async (req, res) =>{
   }
 }
 
+const borrar = async (req, res) =>{
+  let articuloId = req.params.id;  
+  try{
+    const articuloBorrar = await Articulo.findOneAndDelete({_id : articuloId});
+    if (articuloBorrar){
+      return res.status(200).json({
+        status: 'success',
+        articulo: articuloBorrar,
+        mensaje: 'articulo borrado'
+      })
+    }else{
+      return res.status(400).json({
+        status: 'error',
+        mensaje:'no se encontro el articulo a borrar'
+      })
+    }
+
+
+  }catch(error) {
+    console.error('Error al borrar el artículo:', error);
+    return res.status(500).json({
+      status: 'error',
+      mensaje: 'No se pudo borrar el articulo',
+    });
+
+  }
+
+  }
+
 
 module.exports = {
   crear,
   obtenerTodos,
-  uno
+  uno,
+  borrar
 };
 
 
