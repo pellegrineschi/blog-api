@@ -113,10 +113,23 @@ const borrar = async (req, res) => {
 const editar = async (req, res) => {
   let articuloID = req.params.id;
   let parametro = req.body;
+  try {
+    let validarTitulo =
+      !validator.isEmpty(parametro.titulo) &&
+      validator.isLength(parametro.titulo, { min: 5, max: 25 });
+    let validarContenido = !validator.isEmpty(parametro.contenido);
+    if (!validarTitulo || !validarContenido) {
+      throw new Error("no se a validado la informacion");
+    }
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      mensaje: "faltan datos",
+    });
+  }
 
   try {
-    validarDatos(parametro);
-    const articuloUpdate = await Articulo.findOneAndUpdate(
+        const articuloUpdate = await Articulo.findOneAndUpdate(
       { _id: articuloID },
       parametro,
       { new: true }
@@ -142,19 +155,7 @@ const editar = async (req, res) => {
   }
 };
 
-const validarDatos = (parametro) => {
-  if (!parametro.titulo || !parametro.contenido) {
-    throw new Error("Faltan datos en el parámetro");
-  }
 
-  let validarTitulo =
-    !validator.isEmpty(parametro.titulo) &&
-    validator.isLength(parametro.titulo, { min: 5, max: 25 });
-  let validarContenido = !validator.isEmpty(parametro.contenido);
-  if (!validarTitulo || !validarContenido) {
-    throw new Error("no se a validado la informacion");
-  }
-};
 
 module.exports = {
   crear,
