@@ -2,7 +2,7 @@ const validator = require("validator");
 const Articulo = require("../modelos/Articulo");
 const { default: mongoose } = require("mongoose");
 
-const crear = async(req, res) => {
+const crear = async (req, res) => {
   //recoger parametros por post para guardar
   let parametro = req.body;
   //validar
@@ -11,124 +11,155 @@ const crear = async(req, res) => {
       !validator.isEmpty(parametro.titulo) &&
       validator.isLength(parametro.titulo, { min: 5, max: 25 });
     let validarContenido = !validator.isEmpty(parametro.contenido);
-        if(!validarTitulo || !validarContenido){
-            throw new Error('no se a validado la informacion');
-        }
+    if (!validarTitulo || !validarContenido) {
+      throw new Error("no se a validado la informacion");
+    }
   } catch (error) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       mensaje: "faltan datos",
     });
   }
 
   // crear el objeto a guardar
   const articulo = new Articulo(parametro);
-  
+
   //guardar el articulo en la db
-  try{
+  try {
     const articuloGuardado = await articulo.save();
     return res.status(200).json({
-      status: 'success',
+      status: "success",
       articulo: articuloGuardado,
-      mensaje: 'articulo guardado'
+      mensaje: "articulo guardado",
     });
-  }catch(error){
-    console.error('error al guardar el articulo', error);
+  } catch (error) {
+    console.error("error al guardar el articulo", error);
     return res.status(400).json({
-      status: 'error',
-      mensaje: 'no se pudo guardar el archivo'
-    })
+      status: "error",
+      mensaje: "no se pudo guardar el archivo",
+    });
   }
-  
 };
 
 const obtenerTodos = async (req, res) => {
   try {
-    
-    const ultimos = req.params.cant; 
-      const articulos = await Articulo.find().sort({fecha: -1}).limit(ultimos);//traigo y ordeno de mandera desendente los ultimos alticulos que me llegan por parametro
-      return res.status(200).json({
-      status: 'success',
-      contador: articulos.length,//cuento la cantidad de objetos en el array
+    const ultimos = req.params.cant;
+    const articulos = await Articulo.find().sort({ fecha: -1 }).limit(ultimos); //traigo y ordeno de mandera desendente los ultimos alticulos que me llegan por parametro
+    return res.status(200).json({
+      status: "success",
+      contador: articulos.length, //cuento la cantidad de objetos en el array
       articulos: articulos,
-      mensaje: 'Artículos obtenidos exitosamente',
+      mensaje: "Artículos obtenidos exitosamente",
     });
   } catch (error) {
-    console.error('Error al obtener los artículos:', error);
+    console.error("Error al obtener los artículos:", error);
     return res.status(500).json({
-      status: 'error',
-      mensaje: 'No se pudieron obtener los artículos',
+      status: "error",
+      mensaje: "No se pudieron obtener los artículos",
     });
   }
 };
 
-const uno = async (req, res) =>{
-  let id = req.params.id
+const uno = async (req, res) => {
+  let id = req.params.id;
   try {
-    const articuloEncontrado = await Articulo.findById(id);//trae un articulo por el id
+    const articuloEncontrado = await Articulo.findById(id); //trae un articulo por el id
     if (articuloEncontrado) {
       return res.status(200).json({
-       status: 'success',
-       articulo: articuloEncontrado,
-       mensaje: 'articulo econtrado' 
-      })
+        status: "success",
+        articulo: articuloEncontrado,
+        mensaje: "articulo econtrado",
+      });
     } else {
       return res.status(400).json({
-        status: 'error',
-        mensaje: 'articulo no encontrado'
-      })
+        status: "error",
+        mensaje: "articulo no encontrado",
+      });
     }
   } catch (error) {
-    console.error('Error al obtener el artículo:', error);
+    console.error("Error al obtener el artículo:", error);
     return res.status(500).json({
-      status: 'error',
-      mensaje: 'No se pudieron obtener el articulo',
+      status: "error",
+      mensaje: "No se pudieron obtener el articulo",
     });
   }
-}
+};
 
-const borrar = async (req, res) =>{
-  let articuloId = req.params.id;  
-  try{
-    const articuloBorrar = await Articulo.findOneAndDelete({_id : articuloId});
-    if (articuloBorrar){
+const borrar = async (req, res) => {
+  let articuloId = req.params.id;
+  try {
+    const articuloBorrar = await Articulo.findOneAndDelete({ _id: articuloId });
+    if (articuloBorrar) {
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         articulo: articuloBorrar,
-        mensaje: 'articulo borrado'
-      })
-    }else{
+        mensaje: "articulo borrado",
+      });
+    } else {
       return res.status(400).json({
-        status: 'error',
-        mensaje:'no se encontro el articulo a borrar'
-      })
+        status: "error",
+        mensaje: "no se encontro el articulo a borrar",
+      });
+    }
+  } catch (error) {
+    console.error("Error al borrar el artículo:", error);
+    return res.status(500).json({
+      status: "error",
+      mensaje: "No se pudo borrar el articulo",
+    });
+  }
+};
+
+const editar = async (req, res) => {
+  let articuliID = req.params.id;
+  let parametro = req.body
+
+  try {
+    validarDatos(res,parametro)
+    const articuloUpdate = await Articulo.findOneAndUpdate({_id: articuliID},parametro,{new:true})
+    if (articuloUpdate) {
+      return res.status(200).json({
+        status: "success",
+        articulo: articuloUpdate,
+        mensaje: "articulo actualizado",
+      });
+    } else {
+      return res.status(400).json({
+        status: "error",
+        mensaje: "no se encontro el articulo a actualizar",
+      });
+    }
+  } catch (error) {
+    console.error("Error al actualizar el artículo:", error);
+    return res.status(500).json({
+      status: "error",
+      mensaje: "No se pudo actualizar el articulo",
+    }); 
+  }
+};
+
+const validarDatos = async(res, parametro) =>{
+    try{
+      let validarTitulo =
+      !validator.isEmpty(parametro.titulo) &&
+      validator.isLength(parametro.titulo, { min: 5, max: 25 });
+    let validarContenido = !validator.isEmpty(parametro.contenido);
+    if (!validarTitulo || !validarContenido) {
+      throw new Error("no se a validado la informacion");
     }
 
-
-  }catch(error) {
-    console.error('Error al borrar el artículo:', error);
-    return res.status(500).json({
-      status: 'error',
-      mensaje: 'No se pudo borrar el articulo',
-    });
-
+    }catch(error){
+      return res.status(400).json({
+        status: "error",
+        mensaje: "faltan datos",
+      });
+    }
   }
-
-  }
-
 
 module.exports = {
   crear,
   obtenerTodos,
   uno,
-  borrar
+  borrar,
+  editar,
 };
-
-
-
-
-
-
-
-
-
