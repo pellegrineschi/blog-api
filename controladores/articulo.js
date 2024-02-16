@@ -155,6 +155,12 @@ const editar = async (req, res) => {
   }
 };
 
+const subir = (req, res) =>{
+  return res.status(200).json({
+    status:'success'
+  })
+}
+
 
 
 module.exports = {
@@ -163,4 +169,5 @@ module.exports = {
   uno,
   borrar,
   editar,
+  subir
 };
