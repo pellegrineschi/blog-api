@@ -1,7 +1,20 @@
 const {Router} = require('express');
 const router = Router();
+const multer = require('multer');
 
 const ArticuloController = require ('../controladores/articulo');
+
+const almacenamiento = multer.diskStorage({
+
+    destination:(req, file, cb) =>{
+        cb (null,'.imagenes/articulos');
+        },
+    filename:(req, file, cb) =>{
+        cb (null,'articulo'+ Date.now()+file.originalname);
+        }    
+})
+
+const subidas = multer({storage:almacenamiento});
 
 //rutas
 router.post('/crear', ArticuloController.crear);
