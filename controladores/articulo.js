@@ -156,8 +156,11 @@ const editar = async (req, res) => {
 };
 
 const subir = (req, res) =>{
+
+  console.log(req.file);
   return res.status(200).json({
-    status:'success'
+    status:'success',
+    files: req.file
   })
 }
 

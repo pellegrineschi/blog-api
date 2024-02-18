@@ -1,15 +1,18 @@
 const {Router} = require('express');
 const router = Router();
 const multer = require('multer');
+const path = require('path');
+
 
 const ArticuloController = require ('../controladores/articulo');
 
 const almacenamiento = multer.diskStorage({
 
-    destination:(req, file, cb) =>{
-        cb (null,'.imagenes/articulos');
+    destination:function(req, file, cb){
+        const rutaDestino = path.join(__dirname, '..', 'imagenes', 'articulos');
+        cb (null,rutaDestino);
         },
-    filename:(req, file, cb) =>{
+    filename:function(req, file, cb){
         cb (null,'articulo'+ Date.now()+file.originalname);
         }    
 })
@@ -22,6 +25,6 @@ router.get('/traer/:cant?', ArticuloController.obtenerTodos);//agrego parametro 
 router.get('/articulo/:id', ArticuloController.uno);
 router.delete('/articulo/:id', ArticuloController.borrar);
 router.put('/articulo/:id', ArticuloController.editar); 
-router.post('/subir-imagen/:id', ArticuloController.subir); 
+router.post('/subir-imagen/:id',subidas.single('file0'), ArticuloController.subir); 
 
 module.exports = router; 
