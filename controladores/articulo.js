@@ -1,4 +1,5 @@
-const fs = require('fs');
+const fs = require("fs");
+const path = require('path');
 const validator = require("validator");
 const Articulo = require("../modelos/Articulo");
 const { default: mongoose } = require("mongoose");
@@ -130,7 +131,7 @@ const editar = async (req, res) => {
   }
 
   try {
-        const articuloUpdate = await Articulo.findOneAndUpdate(
+    const articuloUpdate = await Articulo.findOneAndUpdate(
       { _id: articuloID },
       parametro,
       { new: true }
@@ -156,38 +157,82 @@ const editar = async (req, res) => {
   }
 };
 
-const subir = (req, res) =>{
-
-  if(!req.file && !req.files){
+const subir = async (req, res) => {
+  if (!req.file && !req.files) {
     return res.status(400).json({
-      status: 'error',
-      mensaje: 'peticion invalida'
-    })
+      status: "error",
+      mensaje: "peticion invalida",
+    });
   }
 
-  console.log(req.file);//capturo el fichero de imagen subido
   let archivo = req.file.originalname; //nombre del archivo
-  let archivo_split = archivo.split("\.");
+  let archivo_split = archivo.split(".");
   let extencion = archivo_split[1];
-  
-  if(extencion != 'png' && extencion != 'jpg' && extencion != 'jpeg'){
 
-    fs.unlink(req.file.path,(error) =>{
+  if (extencion != "png" && extencion != "jpg" && extencion != "jpeg") {
+    fs.unlink(req.file.path, (error) => {
       return res.status(400).json({
-        status:'error',
-        mensaje:'imagen invalida'
+        status: "error",
+        mensaje: "imagen invalida",
       });
-    
+    });
+  } else {
+    let articuloID = req.params.id;
+
+    try {
+      const articuloUpdate = await Articulo.findOneAndUpdate(
+        { _id: articuloID },
+        { imagen: req.file.filename },
+        { new: true }
+      );
+      if (articuloUpdate) {
+        return res.status(200).json({
+          status: "success",
+          articulo: articuloUpdate,
+          fichero: req.file,
+        });
+      } else {
+        return res.status(400).json({
+          status: "error",
+          mensaje: "no se encontro el articulo a actualizar",
+        });
+      }
+    } catch (error) {
+      console.error("Error al actualizar el artículo:", error);
+      return res.status(500).json({
+        status: "error",
+        mensaje: "No se pudo actualizar el articulo",
+      });
+    }
+  }
+};
+
+const imagen = async(req, res) =>{
+  let fichero = req.params.fichero
+  let rutaFisica = './imagenes/articulos/' + fichero
+  try{
+    fs.stat(rutaFisica,(error, stat) =>{
+      if(error){
+        return res.status(400).json({
+          status: error,
+          mensaje:'la imagen no existe',
+          existe,
+          fichero,
+          rutaFisica
+        })
+      }else{
+        return res.sendFile(path.resolve(rutaFisica));  
+      }    
       })
-  }else{
-    return res.status(200).json({
-      status:'success',
-      files: req.file
+
+  }catch(error){
+    return res.status(500).json({
+      status: 'error',
+      mensaje: 'error al obtener la imagen'
     })
-  }  
-}
 
-
+  }
+  }
 
 module.exports = {
   crear,
@@ -195,5 +240,6 @@ module.exports = {
   uno,
   borrar,
   editar,
-  subir
+  subir,
+  imagen
 };

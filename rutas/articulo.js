@@ -25,6 +25,8 @@ router.get('/traer/:cant?', ArticuloController.obtenerTodos);//agrego parametro 
 router.get('/articulo/:id', ArticuloController.uno);
 router.delete('/articulo/:id', ArticuloController.borrar);
 router.put('/articulo/:id', ArticuloController.editar); 
-router.post('/subir-imagen/:id',subidas.single('file0'), ArticuloController.subir); 
+router.post('/subir-imagen/:id',subidas.single('file0'), ArticuloController.subir);
+router.get('/imagen/:fichero', ArticuloController.imagen);
+
 
 module.exports = router; 
