@@ -1,3 +1,4 @@
+const fs = require('fs');
 const validator = require("validator");
 const Articulo = require("../modelos/Articulo");
 const { default: mongoose } = require("mongoose");
@@ -157,11 +158,33 @@ const editar = async (req, res) => {
 
 const subir = (req, res) =>{
 
-  console.log(req.file);
-  return res.status(200).json({
-    status:'success',
-    files: req.file
-  })
+  if(!req.file && !req.files){
+    return res.status(400).json({
+      status: 'error',
+      mensaje: 'peticion invalida'
+    })
+  }
+
+  console.log(req.file);//capturo el fichero de imagen subido
+  let archivo = req.file.originalname; //nombre del archivo
+  let archivo_split = archivo.split("\.");
+  let extencion = archivo_split[1];
+  
+  if(extencion != 'png' && extencion != 'jpg' && extencion != 'jpeg'){
+
+    fs.unlink(req.file.path,(error) =>{
+      return res.status(400).json({
+        status:'error',
+        mensaje:'imagen invalida'
+      });
+    
+      })
+  }else{
+    return res.status(200).json({
+      status:'success',
+      files: req.file
+    })
+  }  
 }
 
 
